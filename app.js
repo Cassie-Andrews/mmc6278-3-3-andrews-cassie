@@ -14,23 +14,45 @@ app.get('/api/city/:city', async (req, res) => { // declare the GET route /api/c
         const cityInfo = await getCityInfo(city);
         const jobs = await getJobs(city);
         
-        // If no city info or jobs are found,
+        // If no city info AND jobs are found,
         // the endpoint should return a 404 status
-        if (!cityInfo || !jobs) {
+        if (!cityInfo && !jobs) {
             return res.status(404).json({
                 success: false,
                 error: "No results found"
             })
         }
+
+        // No city info found
+        if (!cityInfo) {
+            return res.status(200).json({
+                jobs: jobs,
+                success: false,
+                cityInfo: false
+            })
+        }
+
+        if (!jobs) {
+            return res.status(200).json({
+                success: false,
+                cityInfo: cityInfo,
+                jobs: false
+            })
+        }
+
         // If city info or jobs are found, return the result as JSON.
         res.json({
         // The returned JSON object should have two keys:
             cityInfo,// cityInfo (with value of the getCityInfo function)
             jobs// jobs (with value of the getJobs function)
     })
+
     } catch (error) {
         console.log(error);
-
+        return res.status().json({
+            success: false,
+            error: error
+        })
     }
 })
 
